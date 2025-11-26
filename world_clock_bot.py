@@ -1,24 +1,23 @@
 import os
 import asyncio
 from datetime import datetime
-from zoneinfo import ZoneInfo   # Native timezones
-
+from zoneinfo import ZoneInfo
 import discord
 
 # -----------------------------
 # Load secrets from environment
 # -----------------------------
-TOKEN = os.getenv("BOT_TOKEN")
+# Try BOT_TOKEN first, then DISCORD_TOKEN (your current secret name)
+TOKEN = os.getenv("BOT_TOKEN") or os.getenv("DISCORD_TOKEN")
 CHANNEL_ID = int(os.getenv("CHANNEL_ID", "0"))
 
 if not TOKEN:
-    raise RuntimeError("❌ BOT_TOKEN secret missing! Set it in Fly.io > Secrets.")
+    raise RuntimeError("❌ BOT_TOKEN / DISCORD_TOKEN secret missing! Set it in Fly.io > Secrets.")
 if CHANNEL_ID == 0:
     raise RuntimeError("❌ CHANNEL_ID secret missing! Set it in Fly.io > Secrets.")
 
-UPDATE_INTERVAL_SECONDS = 60  # refresh every minute
+UPDATE_INTERVAL_SECONDS = 60
 
-# Timezones to display
 TIMEZONES = [
     ("PST (NA West)", "America/Los_Angeles"),
     ("CST (NA Central)", "America/Chicago"),
@@ -27,13 +26,11 @@ TIMEZONES = [
     ("UTC+8 (Asia)", "Asia/Taipei"),
 ]
 
-# Discord client
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 
 
 async def world_clock_loop():
-    """Background updater for the clock message."""
     await client.wait_until_ready()
 
     channel = client.get_channel(CHANNEL_ID)
