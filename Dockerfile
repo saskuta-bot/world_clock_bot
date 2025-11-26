@@ -1,14 +1,10 @@
-# Use official Python image
 FROM python:3.11-slim
 
-# Set work directory
-WORKDIR /app
+WORKDIR /usr/src/app
 
-# Copy project files into the container
-COPY . /app
-
-# Install dependencies
+COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Run the bot
+COPY . .
+
 CMD ["python", "world_clock_bot.py"]
