@@ -1,14 +1,25 @@
 app = "world-clock-bot"
 
 [build]
-  builder = "paketo-buildpacks/builder:base"
+  builtin = "python"
 
 [env]
   PYTHONUNBUFFERED = "1"
 
+[processes]
+  app = "python world_clock_bot.py"
+
 [[services]]
   internal_port = 8080
-  processes = ["worker"]
+  protocol = "tcp"
 
-[processes]
-  worker = "python3 world_clock_bot.py"
+  [[services.ports]]
+    port = 80
+
+  [[services.ports]]
+    port = 443
+
+  [services.concurrency]
+    type = "requests"
+    soft_limit = 20
+    hard_limit = 25
