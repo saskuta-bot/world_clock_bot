@@ -1,0 +1,1 @@
+worker: python world_clock_bot.py
