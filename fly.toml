@@ -1,25 +1,12 @@
 app = "world-clock-bot"
+primary_region = "fra"
 
 [build]
-  builtin = "python"
-
-[env]
-  PYTHONUNBUFFERED = "1"
+  dockerfile = "Dockerfile"
 
 [processes]
   app = "python world_clock_bot.py"
 
-[[services]]
-  internal_port = 8080
-  protocol = "tcp"
-
-  [[services.ports]]
-    port = 80
-
-  [[services.ports]]
-    port = 443
-
-  [services.concurrency]
-    type = "requests"
-    soft_limit = 20
-    hard_limit = 25
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"
