@@ -1,22 +1,16 @@
-import os
 import asyncio
 from datetime import datetime
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo  # Python 3.9+
+
+import os
 import discord
 
-# -----------------------------
-# Load secrets from environment
-# -----------------------------
-# Try BOT_TOKEN first, then DISCORD_TOKEN (your current secret name)
-TOKEN = os.getenv("BOT_TOKEN") or os.getenv("DISCORD_TOKEN")
-CHANNEL_ID = int(os.getenv("CHANNEL_ID", "0"))
+# ----- read from Fly secrets -----
+TOKEN = os.environ["DISCORD_TOKEN"]          # set in Fly secrets
+CHANNEL_ID = int(os.environ["CHANNEL_ID"])   # set in Fly secrets
+# ---------------------------------
 
-if not TOKEN:
-    raise RuntimeError("❌ BOT_TOKEN / DISCORD_TOKEN secret missing! Set it in Fly.io > Secrets.")
-if CHANNEL_ID == 0:
-    raise RuntimeError("❌ CHANNEL_ID secret missing! Set it in Fly.io > Secrets.")
-
-UPDATE_INTERVAL_SECONDS = 60
+UPDATE_INTERVAL_SECONDS = 60  # how often the clock refreshes (seconds)
 
 TIMEZONES = [
     ("PST (NA West)", "America/Los_Angeles"),
@@ -29,41 +23,5 @@ TIMEZONES = [
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 
-
-async def world_clock_loop():
-    await client.wait_until_ready()
-
-    channel = client.get_channel(CHANNEL_ID)
-    if channel is None:
-        print(f"❌ Could not find channel ID {CHANNEL_ID}")
-        return
-
-    message = await channel.send("Starting world clock...")
-
-    while not client.is_closed():
-        now_utc = datetime.now(ZoneInfo("UTC"))
-
-        lines = ["🌍 **World Clock** (auto-updates every minute)\n"]
-
-        for label, tz_name in TIMEZONES:
-            tz = ZoneInfo(tz_name)
-            local_time = now_utc.astimezone(tz)
-            lines.append(f"**{label}** — {local_time:%Y-%m-%d %H:%M}")
-
-        lines.append(f"\n_Last update:_ {now_utc:%Y-%m-%d %H:%M} UTC")
-
-        try:
-            await message.edit(content="\n".join(lines))
-        except Exception as e:
-            print(f"⚠ Error editing message: {e}")
-
-        await asyncio.sleep(UPDATE_INTERVAL_SECONDS)
-
-
-@client.event
-async def on_ready():
-    print(f"✅ Logged in as {client.user} (ID: {client.user.id})")
-    client.loop.create_task(world_clock_loop())
-
-
-client.run(TOKEN)
+...
+# (rest of your file stays the same)
