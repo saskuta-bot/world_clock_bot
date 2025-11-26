@@ -1,0 +1,14 @@
+app = "world-clock-bot"
+
+[build]
+  builder = "paketo-buildpacks/builder:base"
+
+[env]
+  PYTHONUNBUFFERED = "1"
+
+[[services]]
+  internal_port = 8080
+  processes = ["worker"]
+
+[processes]
+  worker = "python3 world_clock_bot.py"
